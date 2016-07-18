@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="
+http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+http://www.springframework.org/schema/context 
+http://www.springframework.org/schema/context/spring-context-3.0.xsd
+">
+ 
+	<!-- 引入属性文件 -->
+	<context:property-placeholder location="classpath:jdbc.properties" />
+ 
+	<!-- 自动扫描dao和service包(自动注入) -->
+	<context:component-scan base-package="com.wh.*.dao,com.wh.*.service" />
+ 
+ 	<bean id="mainStarter" class="com.wh.common.support.MainStarter"></bean>
+ 	
+ 	<bean id="mainStarterDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="mainStarter" />
+		<property name="targetMethod" value="run" />
+		<property name="concurrent" value="false" />
+	</bean>
+	<bean id="mainStarterDetailTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="mainStarterDetail" />
+		<property name="startDelay" value="10000" /> 
+    	<property name="repeatCount" value="0" /> 
+	</bean>
+ 	
+ 	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+ 		<property name="triggers">
+			 <list>
+			 	<ref bean="mainStarterDetailTrigger"/>
+			 </list>
+ 		</property>
+ 	</bean>
+</beans>
